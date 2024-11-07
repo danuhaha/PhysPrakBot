@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Black">
+    <option name="sdkName" value="Python 3.10 (PhysPrakBot)" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State />
+          <State>
+            <id>RegExp</id>
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>Angular</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="Remote Python 3.13.0 (sftp://ubuntu@207.127.92.16:22/home/ubuntu/physprakbot/venv/bin/python3.13)" project-jdk-type="Python SDK" />
+</project>
