@@ -4,7 +4,7 @@
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/.venv" />
     </content>
-    <orderEntry type="jdk" jdkName="Remote Python 3.13.0 (sftp://ubuntu@207.127.92.16:22/home/ubuntu/physprakbot/venv/bin/python3.13)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Remote Python 3.12.3 (sftp://danuhaha@iluvurmom.servebeer.com:22/home/danuhaha/physprakbot/venv/bin/python3.12)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

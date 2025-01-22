@@ -1,5 +1,6 @@
 import sympy as sp
 import io
+import matplotlib
 import matplotlib.pyplot as plt
 from sympy.parsing.latex import parse_latex
 
@@ -22,7 +23,7 @@ def compute_uncertainty(formula_str, uncertain_vars):
 
     variance = 0
     for var in uncertain_vars:
-        uncertainty_symbol = sp.Symbol(f'delta_{var}', real=True, positive=True)
+        uncertainty_symbol = sp.Symbol(f'Delta_{var}', real=True, positive=True)
         partial_derivative = partial_derivatives[var]
         variance_contribution = (partial_derivative * uncertainty_symbol) ** 2
         variance += variance_contribution
@@ -30,12 +31,13 @@ def compute_uncertainty(formula_str, uncertain_vars):
     total_uncertainty = sp.sqrt(variance)
     total_uncertainty = sp.radsimp(total_uncertainty)
     total_uncertainty = sp.simplify(total_uncertainty)
-    total_uncertainty = sp.latex(total_uncertainty)
-    return total_uncertainty
+    total_uncertainty_latex = sp.latex(total_uncertainty)
+    return total_uncertainty_latex, total_uncertainty
 
 
 def visualize_latex(latex_str, output_filename='latex_output.png'):
-    plt.figure()
+    matplotlib.rcParams["mathtext.fontset"] = "cm"
+    plt.figure(dpi=200)
     plt.text(0.5, 0.5, f"${latex_str}$", fontsize=40, ha='center', va='center')
     plt.axis('off')
     buf = io.BytesIO()
