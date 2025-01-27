@@ -4,13 +4,14 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters.command import Command
 from config_reader import config
 from aiogram.types import Message, ContentType, ReplyKeyboardMarkup, KeyboardButton, WebAppInfo, BufferedInputFile, \
-    ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery
+    CallbackQuery
+from aiogram.client.default import DefaultBotProperties
 from aiogram.utils.keyboard import InlineKeyboardBuilder
-from random import *
+from aiogram.enums import ParseMode
 import indirect_error
 
 logging.basicConfig(level=logging.INFO)
-bot = Bot(token=config.bot_token.get_secret_value())
+bot = Bot(token=config.bot_token.get_secret_value(), default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher()
 
 # Temporary data storage
@@ -29,64 +30,52 @@ async def cmd_start(message: types.Message):
     await message.answer("Привет! Чтобы рассчитать погрешность, вызови команду /error")
 
 
-"""@dp.message(Command("random"))
-async def cmd_help(message: types.Message):
-    builder = InlineKeyboardBuilder()
-    builder.add(types.InlineKeyboardButton(text="Нажми меня", callback_data="random_value"))
-    await message.answer("Генератор рандомных чисел", reply_markup=builder.as_markup())
-
-
-@dp.callback_query(F.data == "random_value")
-async def send_random_value(callback: types.CallbackQuery):
-    await callback.message.answer(str(randint(1, 10)))"""
-
-
 @dp.callback_query()
 async def handle_inline_button(query: CallbackQuery):
     user_id = query.from_user.id
 
-    if user_id in temp_data:
-        data = temp_data[user_id]
+    await query.message.edit_reply_markup(reply_markup=None)
 
-        await query.message.edit_reply_markup(reply_markup=None)
+    if query.data == "new":
+        await query.message.bot.send_message(
+            chat_id=query.message.chat.id,
+            text="Starting new process..."
+        )
+        # Handle new logic here
+    elif query.data == "menu":
+        await query.message.bot.send_message(
+            chat_id=query.message.chat.id,
+            text="Returning to menu..."
+        )
+        # Handle menu logic here
+    elif query.data == "edit":
+        if user_id in temp_data:
+            data = temp_data[user_id]
 
-        if query.data == "edit":
             await query.message.bot.send_message(
                 chat_id=query.message.chat.id,
                 text=f"Editing data: {data['latex_input']} and {data['uncertain_vars']}")
 
             # Handle edit logic here
-
-        elif query.data == "new":
+        else:
             await query.message.bot.send_message(
                 chat_id=query.message.chat.id,
-                text="Starting new process..."
+                text="Data expired or not found."
             )
-            # Handle new logic here
-
-        # Delete data after processing
-        del temp_data[user_id]
-    else:
-        await query.message.bot.send_message(
-            chat_id=query.message.chat.id,
-            text="Data expired or not found."
-        )
-
-    await query.answer()
+    # Delete data after processing
+    del temp_data[user_id]
 
 
 @dp.message(F.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: Message):
-    latex_input, uncertain_vars = message.web_app_data.data.split(';')
+    latex_input, uncertain_vars_input = message.web_app_data.data.split(';')
 
-    total_uncertainty_latex, total_uncertainty = indirect_error.compute_uncertainty(latex_input, uncertain_vars)
-
-    buffer_image = indirect_error.visualize_latex(total_uncertainty_latex)
+    total_uncertainty_latex = indirect_error.compute_uncertainty(latex_input, uncertain_vars_input)
 
     user_id = message.from_user.id
     temp_data[user_id] = {
         "latex_input": latex_input,
-        "uncertain_vars": uncertain_vars,
+        "uncertain_vars": uncertain_vars_input,
     }
 
     # Schedule data removal after timeout
@@ -94,16 +83,31 @@ async def handle_web_app_data(message: Message):
 
     # Inline keyboard with Edit and New buttons
     builder = InlineKeyboardBuilder()
-    builder.add(types.InlineKeyboardButton(text="Редкатировать", callback_data="edit"),
-                types.InlineKeyboardButton(text="Новый расчет", callback_data="new"))
+    builder.add(types.InlineKeyboardButton(text="Редактировать", callback_data="edit"),
+                types.InlineKeyboardButton(text="Новый расчет", callback_data="new"),
+                types.InlineKeyboardButton(text="Меню", callback_data="menu"))
     reply_markup = builder.as_markup()
 
-    with buffer_image as image:
+    buffer_image_initial = indirect_error.visualize_latex(
+        f"${latex_input}$" + r"$\, , \,$" + f"${uncertain_vars_input}$")
+
+    with buffer_image_initial as image:
         await message.answer_photo(
             BufferedInputFile(
                 image.read(),
                 filename="image from buffer.jpg"
-            ),
+            ), caption="<b>Формула и переменные с погрешностью</b>",
+            show_caption_above_media=True
+        )
+    buffer_image_uncertainty = indirect_error.visualize_latex(f"${total_uncertainty_latex}$")
+
+    with buffer_image_uncertainty as image:
+        await message.answer_photo(
+            BufferedInputFile(
+                image.read(),
+                filename="image from buffer.jpg"
+            ), caption="<b>Косвенная погрешность</b>",
+            show_caption_above_media=True,
             reply_markup=reply_markup
         )
 

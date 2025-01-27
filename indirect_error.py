@@ -32,13 +32,13 @@ def compute_uncertainty(formula_str, uncertain_vars):
     total_uncertainty = sp.radsimp(total_uncertainty)
     total_uncertainty = sp.simplify(total_uncertainty)
     total_uncertainty_latex = sp.latex(total_uncertainty)
-    return total_uncertainty_latex, total_uncertainty
+    return total_uncertainty_latex
 
 
-def visualize_latex(latex_str, output_filename='latex_output.png'):
+def visualize_latex(latex_string):
     matplotlib.rcParams["mathtext.fontset"] = "cm"
     plt.figure(dpi=200)
-    plt.text(0.5, 0.5, f"${latex_str}$", fontsize=40, ha='center', va='center')
+    plt.text(0.5, 0.5, latex_string, fontsize=40, ha='center', va='center')
     plt.axis('off')
     buf = io.BytesIO()
     plt.savefig(buf, bbox_inches='tight', pad_inches=0.1, format='png')

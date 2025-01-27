@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="danuhaha@iluvurmom.servebeer.com:22 key" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
+  <component name="PublishConfigData" autoUpload="Always" serverName="homeserver" remoteFilesAllowedToDisappearOnAutoupload="false" autoUploadExternalChanges="true">
     <serverData>
-      <paths name="danuhaha@iluvurmom.servebeer.com:22 key">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/tmp/pycharm_project_469" local="$PROJECT_DIR$" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="homeserver">
         <serverdata>
           <mappings>
